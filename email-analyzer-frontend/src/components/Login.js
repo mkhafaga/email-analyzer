@@ -5,21 +5,16 @@ import {Button, Card, Container, ListGroup, Row} from "react-bootstrap";
 import styles from './styles.module.css';
 import logo from "../logo.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Header from "./Header.js";
 
-function Login({setName}) {
+function Login() {
     const history = useHistory();
 
     const handleSuccess = (result) => {
-        console.log(`result: ${JSON.stringify(result)}`);
-        console.log(result.profileObj);
-        setName(result.profileObj.name);
+        sessionStorage.setItem('user_full_name', result.profileObj.name);
         history.push('/analyze-emails', result);
-        console.log('does it push?!');
     }
 
     const handleFailure = (result) => {
-        console.log('does it fail?');
         console.log(result);
     }
 
@@ -41,7 +36,6 @@ function Login({setName}) {
                     </ListGroup>
                 </Card.Body>
             </Card>
-            {/*<Row sm={3} style={{alignItems: 'center'}} className={styles.main2}>*/}
             <GoogleLogin
                 clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
                 buttonText="Login in with Google"
@@ -61,9 +55,6 @@ function Login({setName}) {
                 }
                 cookiePolicy={'single_host_origin'}
             />
-            {/*</Row>*/}
-
-
         </Container>
 
     )

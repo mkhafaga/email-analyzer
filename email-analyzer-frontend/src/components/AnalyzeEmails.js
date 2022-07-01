@@ -1,11 +1,9 @@
 import React from 'react'
 import '../App.css';
-import {GoogleLogout} from 'react-google-login';
 import {useHistory, useLocation} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {Card, Container, Row} from "react-bootstrap";
+import {Card, Container} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Styles from './styles.module.css';
 import Loading from "./Loading.js";
 
 
@@ -24,11 +22,9 @@ function AnalyzeEmails() {
             history.push('/');
             return;
         }
-        console.log(result.profileObj);
         setName(result.profileObj.name);
 
         function analyzeEmails() {
-            console.log('does it come to the front end?');
             return fetch('emails/analyze-sent-messages', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -44,11 +40,8 @@ function AnalyzeEmails() {
         };
 
         analyzeEmails().then(response => {
-            // console.log(`response: ${JSON.stringify(response)}`);
-            // console.log(response);
             if (!response.ok) {
                 if (response.status === 401) {
-                    console.log(`response: ${JSON.stringify(response)}`);
                     handleLogout();
                 } else {
                     throw Error(response.statusMessage);
@@ -56,11 +49,10 @@ function AnalyzeEmails() {
             }
             return response.json();
         }).then(data => {
-            setSnippets(data.snippets.slice(0, 30));
+            setSnippets(data.top30Snippets);
             setLoading(false);
-            console.log(`data: ${JSON.stringify(data)}`);
         }).catch(error => {
-            console.log(`shit: ${JSON.stringify(error)}`);
+            console.log(`Caught error: ${JSON.stringify(error)}`);
         })
     }, []);
 
@@ -75,16 +67,22 @@ function AnalyzeEmails() {
             {/*<GoogleLogout clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} onLogoutSuccess={handleLogout}*/}
             {/*              buttonText={'Logout'}/>*/}
             {loading && <Loading name={name}/>}
-
+            <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '30px'}}>
+                {!loading &&
+                    (<h4 style={{color: 'red'}}>Congrats {name}, we have found {snippets.length} snippets for
+                        you.</h4>)}
+            </Container>
             {snippets.map((snippet, index) => (
-                <Card key={`card-${index}`} xs={4} style={{margin: '10px'}} bg='warning' text='light'>
-                    <Card.Header className='text-white bg-danger'>Suggested Shortcut: </Card.Header>
+                <Card key={`card-${index}`} xs={4} style={{margin: '30px'}} bg='warning' text='light'>
+                    <Card.Header className='text-white bg-danger'>Suggested Shortcut: /{snippet['shortcut']}
+                    </Card.Header>
                     <Card.Body>
-                        <Card.Text className='p-3 mb-2 bg-white text-dark'>
+                        <Card.Text className='p-3 mb-2 text-light h5'>
                             {snippet['text']}
                         </Card.Text>
                     </Card.Body>
-                    <Card.Footer className='text-white bg-danger'>Using the snippet calculated above can save you up
+                    <Card.Footer className='text-white bg-danger'>The snippet above was
+                        found {snippet['occurrences']} times, using it with TextBlaze can save you up
                         to {snippet['timeSaved']} minutes of typing.</Card.Footer>
                 </Card>
 

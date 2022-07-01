@@ -4,7 +4,6 @@ var {google} = require('googleapis');
 var Trie = require('../utils/WordsTrie');
 
 router.post('/analyze-sent-messages', async function (request, response) {
-    console.log('does it hit the backend?');
     const {clientId, clientSecret, userId, token} = request.body;
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
     oAuth2Client.setCredentials(token);
@@ -25,9 +24,6 @@ router.post('/analyze-sent-messages', async function (request, response) {
                 pageToken
             });
         } catch (error) {
-            console.log(error.code);
-            // response.status(error.code);
-            // response.send({error: error.message});
             console.log(`error caught: ${JSON.stringify(error)}`);
             return response.status(error.code).send({error: error.message});
         }
@@ -43,7 +39,7 @@ router.post('/analyze-sent-messages', async function (request, response) {
         } else {
             pageToken = res.data.nextPageToken;
         }
-        // hasMore = false;
+
         let count = 1;
         for (const id of sentMessages.keys()) {
             const messagePromise = new Promise(resolve => {
@@ -56,25 +52,17 @@ router.post('/analyze-sent-messages', async function (request, response) {
             count++;
             messagePromises.push(messagePromise);
         }
-
     }
 
     let data;
     const myTrie = new Trie();
     try{
-        data = await Promise.all(messagePromises).catch(error => {
-            response.status(500);
-            response.send({error});
-            console.log(`error caught: ${error}`);
-            return;
-        });
+        data = await Promise.all(messagePromises);
     }catch (error) {
-        console.log(error.code);
         console.log(`error caught: ${JSON.stringify(error)}`);
         return response.status(error.code).send({error: error.message});
     }
 
-    let messagesThatWillBeProcessed = 1;
     const idMaps = new Map();
     data.forEach(sentEmail => {
         const data = sentEmail.data;
@@ -86,7 +74,7 @@ router.post('/analyze-sent-messages', async function (request, response) {
                     } else {
                         idMaps.set(data.id, 1);
                     }
-                    messagesThatWillBeProcessed++;
+
                     let messageBody = new Buffer(part.body.data, 'base64').toString();
                     const timeStampRegex = /On \w{3}, \w{3} \d{1,2}, \d{4} at \d{1,2}:\d{1,2} (am|pm|PM|AM),? .*<\s*[^@]+@[^\.]+.[^>]+\s*>\s*wrote:/;
                     const timestampMatch = messageBody.match(timeStampRegex);
@@ -96,7 +84,6 @@ router.post('/analyze-sent-messages', async function (request, response) {
                     const signatureRegex = /--\s+\n/;
                     const signatureMatch = messageBody.match(signatureRegex);
                     if (signatureMatch) {
-                        // console.log(`signature match: ${signatureMatch.index}`);
                         messageBody = messageBody.substring(0, signatureMatch.index);
                     }
                     messageBody = messageBody.replace(/\r\n/g, '\n');
@@ -114,8 +101,6 @@ router.post('/analyze-sent-messages', async function (request, response) {
                             myTrie.add(messageBodyWords, myTrie.root, i);
                         }
                     }
-
-                    // console.log(`message ${data.id} body: ${messageBody}`);
                 }
             });
         }
@@ -138,20 +123,29 @@ router.post('/analyze-sent-messages', async function (request, response) {
         }
     }
 
-
-    // console.log(`To remove size: ${toRemove.length}`);
-
     toRemove.forEach(word => {
         suffixesSet.delete(word);
     });
 
-    // console.log(suffixesSet);
     const snippets = Array.from(suffixesSet).sort((a, b) => b['text'].length*b['occurrences'] - a['text'].length*a['occurrences']);
-    console.log(snippets);
 
-    // console.log(`sentMessages size: ${sentMessages.length}`);
+    const shortcuts =  new Set();
+    const top30Snippets = snippets.slice(0, 30);
+    for(let i=0;i< top30Snippets.length;i++) {
+        const snippetWords =  top30Snippets[i]['text'].split(' ');
+        for(let j =0;j<snippetWords.length;j++){
+            if(!shortcuts.has(snippetWords[j])){
+                shortcuts.add(snippetWords[j]);
+                top30Snippets[i]['shortcut'] = snippetWords[j];
+                break;
+            }
+        }
+        if(!top30Snippets[i]['shortcut']){
+            top30Snippets[i]['shortcut'] = snippetWords[0].concat(snippetWords[1]);
+        }
+    }
     response.status(200);
-    response.json({snippets});
+    response.json({top30Snippets});
 
 });
 

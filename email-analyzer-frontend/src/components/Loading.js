@@ -1,15 +1,13 @@
 import React from 'react'
-import {Container, Navbar, NavDropdown} from "react-bootstrap";
-import logo from '../logo.png'
+import {Container, Spinner} from "react-bootstrap";
 
 function Loading({name}) {
-    console.log(`name is ${name}`);
     return (
-        <Container>
-            <div>Dear {name}. We are now analyzing your sent emails. Please wait!</div>
+        <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <h2 style={{color: 'red'}}>Dear {name}. We are now analyzing your sent emails. Please wait!</h2>
+            <Spinner animation="border" variant="warning"/>
         </Container>
     );
 }
-
 
 export default Loading;
