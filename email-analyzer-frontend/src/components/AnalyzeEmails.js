@@ -2,7 +2,7 @@ import React from 'react'
 import '../App.css';
 import {useHistory, useLocation} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {Card, Container} from "react-bootstrap";
+import {Button, Card, Container, Row} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from "./Loading.js";
 
@@ -10,6 +10,7 @@ import Loading from "./Loading.js";
 function AnalyzeEmails() {
     const [loading, setLoading] = useState(true);
     const [snippets, setSnippets] = useState([]);
+    const [csvFileName, setCsvFileName] = useState(null);
     const location = useLocation();
     const history = useHistory();
     const [name, setName] = useState(null);
@@ -50,6 +51,7 @@ function AnalyzeEmails() {
             return response.json();
         }).then(data => {
             setSnippets(data.top30Snippets);
+            setCsvFileName(data.csvFileName);
             setLoading(false);
         }).catch(error => {
             console.log(`Caught error: ${JSON.stringify(error)}`);
@@ -61,16 +63,35 @@ function AnalyzeEmails() {
         history.push('/');
     }
 
+    const downloadCSVFile = () => {
+        // return fetch(`exporter?csvFileName=${csvFileName}`);
+        fetch(`exporter/exportCsv?csvFileName=${csvFileName}`)
+            .then(res => res.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${csvFileName}`);
+                document.body.appendChild(link);
+                link.click();
+            });
+    };
+
     return (
 
         <Container>
             {/*<GoogleLogout clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} onLogoutSuccess={handleLogout}*/}
             {/*              buttonText={'Logout'}/>*/}
             {loading && <Loading name={name}/>}
-            <Container style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '30px'}}>
+            <Container>
                 {!loading &&
-                    (<h4 style={{color: 'red'}}>Congrats {name}, we have found {snippets.length} snippets for
-                        you.</h4>)}
+                    <Row style={{display: 'flex', flexDirection: 'row', margin: '30px'}}>
+                        <h4 style={{color: 'red', flex: 7}}>Congrats {name}, we have found
+                            top {snippets.length} snippets for
+                            you.</h4>
+                        <Button variant='danger' style={{flex: 1}} onClick={downloadCSVFile}>Export</Button>
+                    </Row>}
+
             </Container>
             {snippets.map((snippet, index) => (
                 <Card key={`card-${index}`} xs={4} style={{margin: '30px'}} bg='warning' text='light'>

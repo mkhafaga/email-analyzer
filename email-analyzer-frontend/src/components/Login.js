@@ -7,6 +7,13 @@ import logo from "../logo.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Login() {
+    const steps = [
+        'We will ask you to login to your Gmail.',
+        'We will read your sent messages.',
+        'We will analyze the sent emails.',
+        'We will list the frequent snippets we discover.',
+        'You can save the snippets list to import them later in Text Blaze and save your time.'
+    ];
     const history = useHistory();
 
     const handleSuccess = (result) => {
@@ -24,15 +31,9 @@ function Login() {
                 <Card.Header as="h5">How to?</Card.Header>
                 <Card.Body>
                     <ListGroup as="ol" numbered>
-                        <ListGroup.Item as="li" style={{border: 0}}>We will ask you to login to your
-                            Gmail.</ListGroup.Item>
-                        <ListGroup.Item variant='warning' as="li" style={{border: 0}}>We will read your sent
-                            messages.</ListGroup.Item>
-                        <ListGroup.Item as="li" style={{border: 0}}>We will analyze the sent emails.</ListGroup.Item>
-                        <ListGroup.Item as="li" style={{border: 0}}>We will list the frequent snippets we
-                            discover.</ListGroup.Item>
-                        <ListGroup.Item as="li" style={{border: 0}}>You can save the snippets list to import them later
-                            in Text Blaze and save your time.</ListGroup.Item>
+                        {steps.map(step => (
+                            <ListGroup.Item as="li" style={{border: 0}}>{step}</ListGroup.Item>
+                        ))}
                     </ListGroup>
                 </Card.Body>
             </Card>

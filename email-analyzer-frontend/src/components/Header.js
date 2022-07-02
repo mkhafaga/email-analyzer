@@ -9,6 +9,7 @@ function Header() {
     const history = useHistory();
     const [userFullName, setUserFullName] = useState(null);
     useEffect(() => {
+        console.log('does it load?');
         setUserFullName(sessionStorage.getItem('user_full_name'));
         if (userFullName) {
             const menu = document.getElementById("navbarScrollingDropdown");
@@ -20,6 +21,7 @@ function Header() {
     const handleLogout = () => {
         history.push('/');
         sessionStorage.clear();
+        setUserFullName(null);
     }
 
     return (
