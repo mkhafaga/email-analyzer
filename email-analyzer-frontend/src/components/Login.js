@@ -1,12 +1,14 @@
-import React from "react";
+import React, {useContext} from "react";
 import {GoogleLogin} from 'react-google-login';
 import {useHistory} from "react-router-dom";
-import {Button, Card, Container, ListGroup, Row} from "react-bootstrap";
+import {Button, Card, Container, ListGroup} from "react-bootstrap";
 import styles from './styles.module.css';
 import logo from "../logo.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {UserContext} from "../storage/UserContext.js";
 
 function Login() {
+    const {userFullName, setUserFullName} = useContext(UserContext);
     const steps = [
         'We will ask you to login to your Gmail.',
         'We will read your sent messages.',
@@ -17,7 +19,9 @@ function Login() {
     const history = useHistory();
 
     const handleSuccess = (result) => {
-        sessionStorage.setItem('user_full_name', result.profileObj.name);
+        console.log(userFullName);
+        //sessionStorage.setItem('user_full_name', result.profileObj.name);
+        setUserFullName(result.profileObj.name);
         history.push('/analyze-emails', result);
     }
 

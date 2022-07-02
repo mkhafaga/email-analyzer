@@ -3,7 +3,9 @@ const router = express.Router();
 const {google} = require('googleapis');
 const Trie = require('../utils/WordsTrie');
 const objectstocsv = require('objects-to-csv');
-
+/**
+ * API for analyzing sent emails.
+ */
 router.post('/analyze-sent-messages', async function (request, response) {
     console.log('/analyze-sent-messages');
     const {clientId, clientSecret, userId, token} = request.body;

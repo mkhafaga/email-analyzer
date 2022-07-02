@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect} from 'react'
 import {Container, Navbar, NavDropdown} from "react-bootstrap";
 import logo from '../logo.png'
 import styles from './styles.module.css';
 import {GoogleLogout} from "react-google-login";
 import {useHistory} from "react-router-dom";
+import {UserContext} from "../storage/UserContext.js";
 
 function Header() {
+    const {userFullName, setUserFullName} = useContext(UserContext);
+    console.log(userFullName);
     const history = useHistory();
-    const [userFullName, setUserFullName] = useState(null);
     useEffect(() => {
-        console.log('does it load?');
-        setUserFullName(sessionStorage.getItem('user_full_name'));
         if (userFullName) {
             const menu = document.getElementById("navbarScrollingDropdown");
             menu.style.color = 'white';
@@ -20,7 +20,6 @@ function Header() {
 
     const handleLogout = () => {
         history.push('/');
-        sessionStorage.clear();
         setUserFullName(null);
     }
 
