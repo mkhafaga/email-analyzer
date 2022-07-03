@@ -5,6 +5,8 @@ import {useEffect, useState} from "react";
 import {Button, Card, Container, Row} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from "./Loading.js";
+import Header from "./Header.js";
+import styles from './styles.module.css';
 
 
 function AnalyzeEmails() {
@@ -78,38 +80,43 @@ function AnalyzeEmails() {
     };
 
     return (
+        <>
+            <Header/>
+            <Container style={{minWidth: '100%', display: 'flex', flexDirection: 'column'}}>
 
-        <Container>
-            {/*<GoogleLogout clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} onLogoutSuccess={handleLogout}*/}
-            {/*              buttonText={'Logout'}/>*/}
-            {loading && <Loading name={name}/>}
-            <Container>
-                {!loading &&
-                    <Row style={{display: 'flex', flexDirection: 'row', margin: '30px'}}>
-                        <h4 style={{color: 'red', flex: 7}}>Congrats {name}, we have found
-                            top {snippets.length} snippets for
-                            you.</h4>
-                        <Button variant='danger' style={{flex: 1}} onClick={downloadCSVFile}>Export</Button>
-                    </Row>}
+                {/*<GoogleLogout clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} onLogoutSuccess={handleLogout}*/}
+                {/*              buttonText={'Logout'}/>*/}
+                {loading && <Loading name={name}/>}
+                <Container>
+                    {!loading &&
+                        <Row style={{display: 'flex', flexDirection: 'row', margin: '30px'}}>
+                            <h4 style={{color: 'red', flex: 7}}>Congrats {name}, we have found
+                                top {snippets.length} snippets for
+                                you.</h4>
+                            <Button variant='danger' style={{flex: 1}} onClick={downloadCSVFile}>Export</Button>
+                        </Row>}
+
+                </Container>
+                {snippets.map((snippet, index) => (
+                    <Card bg='warning' key={`card-${index}`} xs={4} style={{margin: '30px'}}
+                    >
+                        <Card.Header as='h5' className='text-light'>Suggested Shortcut: /{snippet['shortcut']}
+                        </Card.Header>
+                        <Card.Body as='h6'>
+                            <Card.Text className='p-3 mb-2 text-dark bg-white'>
+                                {snippet['text']}
+                            </Card.Text>
+                        </Card.Body>
+                        <Card.Footer className={styles.bold}>The snippet above was
+                            found {snippet['occurrences']} times, using it with TextBlaze can save you up
+                            to {snippet['timeSaved']} minutes of typing.</Card.Footer>
+                    </Card>
+
+                ))}
 
             </Container>
-            {snippets.map((snippet, index) => (
-                <Card key={`card-${index}`} xs={4} style={{margin: '30px'}} bg='warning' text='light'>
-                    <Card.Header className='text-white bg-danger'>Suggested Shortcut: /{snippet['shortcut']}
-                    </Card.Header>
-                    <Card.Body>
-                        <Card.Text className='p-3 mb-2 text-light h5'>
-                            {snippet['text']}
-                        </Card.Text>
-                    </Card.Body>
-                    <Card.Footer className='text-white bg-danger'>The snippet above was
-                        found {snippet['occurrences']} times, using it with TextBlaze can save you up
-                        to {snippet['timeSaved']} minutes of typing.</Card.Footer>
-                </Card>
+        </>
 
-            ))}
-
-        </Container>
     );
 }
 

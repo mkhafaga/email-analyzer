@@ -45,7 +45,9 @@ router.post('/analyze-sent-messages', async function (request, response) {
             } else {
                 pageToken = res.data.nextPageToken;
             }
-
+            // I had to disable it because I got Error: Quota exceeded for quota metric 'Queries' and limit 'Queries
+            // per minute per user'. I'm using a free tier account. I have to pay to increase the quota :D
+            hasMore = false;
             let count = 1;
             for (const id of sentMessages.keys()) {
                 const messagePromise = new Promise(resolve => {
@@ -112,24 +114,7 @@ router.post('/analyze-sent-messages', async function (request, response) {
             }
         });
 
-        const suffixes = myTrie.print();
-        const toRemove = [];
-        const suffixesSet = new Set(suffixes);
-        for (let i = 0; i < suffixes.length; i++) {
-            for (let j = 0; j < suffixes.length; j++) {
-                if (i === j) {
-                    continue;
-                }
-                if (suffixes[j]['text'].includes(suffixes[i]['text']) || !/\s+/.test(suffixes[i]['text'])) {
-                    toRemove.push(suffixes[i]);
-                    break;
-                }
-            }
-        }
-
-        toRemove.forEach(word => {
-            suffixesSet.delete(word);
-        });
+        const suffixesSet =  myTrie.print();
 
         const snippets = Array.from(suffixesSet).sort((a, b) => b['text'].length*b['occurrences'] - a['text'].length*a['occurrences']);
 
@@ -148,7 +133,11 @@ router.post('/analyze-sent-messages', async function (request, response) {
                 top30Snippets[i]['shortcut'] = snippetWords[0].concat(snippetWords[1]);
             }
         }
-        const csv  = new objectstocsv(top30Snippets);
+        const snippetsToBeExported = [];
+        for(let i=0;i<top30Snippets.length;i++){
+            snippetsToBeExported.push({text: top30Snippets[i]['text'], shortcut: top30Snippets[i]['shortcut']});
+        }
+        const csv  = new objectstocsv(snippetsToBeExported);
         const csvFileName = `${userId}-${Date.now()}.csv`;
         await csv.toDisk(`/tmp/${csvFileName}`);
         response.status(200);

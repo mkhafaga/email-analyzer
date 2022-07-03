@@ -1,28 +1,27 @@
-import React, {useContext, useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Container, Navbar, NavDropdown} from "react-bootstrap";
 import logo from '../logo.png'
 import styles from './styles.module.css';
 import {GoogleLogout} from "react-google-login";
 import {useHistory} from "react-router-dom";
-import {UserContext} from "../storage/UserContext.js";
 
 function Header() {
-    const {userFullName, setUserFullName} = useContext(UserContext);
-    console.log(userFullName);
+    const [name, setName] = useState(null);
     const history = useHistory();
     useEffect(() => {
-        if (userFullName) {
-            const menu = document.getElementById("navbarScrollingDropdown");
+
+        setName(sessionStorage.getItem('user_full_name'));
+        const menu = document.getElementById("navbarScrollingDropdown");
+        if (menu) {
             menu.style.color = 'white';
         }
-
     });
 
     const handleLogout = () => {
         history.push('/');
-        setUserFullName(null);
+        sessionStorage.clear();
     }
-
+    
     return (
         <Navbar bg='danger'>
             <Container>
@@ -39,10 +38,10 @@ function Header() {
                         <div style={{fontWeight: 'bold', fontSize: 'small'}}>Email Analyzer</div>
                     </div>
                 </Navbar.Brand>
-                {userFullName && <Navbar.Collapse className="justify-content-end" style={{display: 'flex'}}>
+                {name && <Navbar.Collapse className="justify-content-end" style={{display: 'flex'}}>
                     <Navbar.Text
                         style={{color: 'white', display: 'flex', alignItems: 'center'}}>
-                        Signed in as: <NavDropdown title={userFullName}
+                        Signed in as: <NavDropdown title={name}
                                                    id="navbarScrollingDropdown"
                                                    className={styles.menuLink}
                                                    bsPrefix={'nav-link menuLink'}>

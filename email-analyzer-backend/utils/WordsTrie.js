@@ -39,7 +39,7 @@ class Trie {
 
     // traverse(this.root, string);
     print() {
-        const words = [];
+        const suffixes = [];
         let newTerritory = 0;
         let wordsCount = 0;
         const traverse = function (node, string) {
@@ -56,9 +56,9 @@ class Trie {
                     traverse(node.children.get(child), string.concat(' ').concat(child));
                 }
                 if (isDeadEnd(node) && newTerritory > 0) {
-                    if (words.length === 0 || (words.length > 0 && !words[words.length - 1]['text'].includes(string))) {
+                    if (suffixes.length === 0 || (suffixes.length > 0 && !suffixes[suffixes.length - 1]['text'].includes(string))) {
                         let timeSaved = Math.ceil(wordsCount* node.occurrences/40);
-                        words.push({text: string.trim(), wordsCount, occurrences: node.occurrences, timeSaved});
+                        suffixes.push({text: string.trim(), wordsCount, occurrences: node.occurrences, timeSaved});
                     }
                     newTerritory = 0;
                     wordsCount =0;
@@ -66,9 +66,9 @@ class Trie {
                 }
             } else {
                 if (string.length > 0 && newTerritory > 1) {
-                    if (words.length === 0 || (words.length > 0 && !words[words.length - 1]['text'].includes(string))) {
+                    if (suffixes.length === 0 || (suffixes.length > 0 && !suffixes[suffixes.length - 1]['text'].includes(string))) {
                         let timeSaved = Math.ceil(wordsCount* node.occurrences/40);
-                        words.push({text: string.trim(), wordsCount, occurrences: node.occurrences, timeSaved});
+                        suffixes.push({text: string.trim(), wordsCount, occurrences: node.occurrences, timeSaved});
                     }
                     newTerritory = 0;
                     wordsCount = 0;
@@ -86,7 +86,25 @@ class Trie {
         }
 
         traverse(this.root, '');
-        return words.length > 0 ? words : null;
+
+        const toRemove = [];
+        const suffixesSet = new Set(suffixes);
+        for (let i = 0; i < suffixes.length; i++) {
+            for (let j = 0; j < suffixes.length; j++) {
+                if (i === j) {
+                    continue;
+                }
+                if (suffixes[j]['text'].includes(suffixes[i]['text']) || !/\s+/.test(suffixes[i]['text'])) {
+                    toRemove.push(suffixes[i]);
+                    break;
+                }
+            }
+        }
+
+        toRemove.forEach(word => {
+            suffixesSet.delete(word);
+        });
+        return suffixesSet.size > 0 ? suffixesSet : null;
     }
 }
 

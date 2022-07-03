@@ -1,6 +1,7 @@
 {
   "name": "analyze-my-emails",
   "type": "module",
+  "homepage": "https://analyze-my-emails.ue.r.appspot.com",
   "proxy": "http://localhost:9000",
   "version": "0.1.0",
   "private": true,

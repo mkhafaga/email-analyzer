@@ -6,14 +6,20 @@
 }
 
 .loginCard {
-    width: 60%;
+    width: 80%;
     align-self: center;
     margin: 20px;
 }
 
 .loginBtn {
-    width: 40%;
+    width: 60%;
     align-self: center;
+    font-weight: bold;
+}
+
+.bold {
+    font-weight: bold;
+    color: red;
 }
 
 .main2 {
