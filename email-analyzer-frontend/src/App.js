@@ -12,7 +12,7 @@ function App() {
         function start() {
             gapi.client.init({
                 clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-                scope: 'https://mail.google.com/',
+                scope: ` https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid`,
             });
         }
 
