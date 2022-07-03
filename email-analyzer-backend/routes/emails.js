@@ -18,7 +18,6 @@ router.post('/analyze-sent-messages', async function (request, response) {
     const messagePromises = [];
 
     try{
-
         while (hasMore) {
 
             let res;
@@ -35,7 +34,6 @@ router.post('/analyze-sent-messages', async function (request, response) {
             }
 
             if (res.data && res.data.messages) {
-                console.log(JSON.stringify(res));
                 res.data.messages.forEach(message => {
                     sentMessages.set(message.id, message);
                 });
@@ -146,8 +144,9 @@ router.post('/analyze-sent-messages', async function (request, response) {
         response.status(200);
         response.json({top30Snippets, csvFileName});
 
-    }catch (e) {
-        console.log(e);
+    }catch (generalError) {
+        console.log(`error caught: ${JSON.stringify(generalError)}`);
+        return response.status(generalError.code).send({error: generalError.message});
     }
 
 });

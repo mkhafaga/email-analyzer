@@ -69,7 +69,6 @@ function AnalyzeEmails() {
     }
 
     const downloadCSVFile = () => {
-        // return fetch(`exporter?csvFileName=${csvFileName}`);
         fetch(`exporter/exportCsv?csvFileName=${csvFileName}`)
             .then(res => res.blob())
             .then(blob => {
