@@ -83,16 +83,13 @@ function AnalyzeEmails() {
         <>
             <Header/>
             <Container style={{minWidth: '100%', display: 'flex', flexDirection: 'column'}}>
-
-                {/*<GoogleLogout clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID} onLogoutSuccess={handleLogout}*/}
-                {/*              buttonText={'Logout'}/>*/}
                 {loading && <Loading name={name}/>}
                 <Container>
                     {!loading &&
                         <Row style={{display: 'flex', flexDirection: 'row', margin: '30px'}}>
                             <h4 style={{color: 'red', flex: 7}}>Congrats {name}, we have found
                                 top {snippets.length} snippets for
-                                you.</h4>
+                                you. You can export them and import them later to TextBlaze!</h4>
                             <Button variant='danger' style={{flex: 1}} onClick={downloadCSVFile}>Export</Button>
                         </Row>}
 

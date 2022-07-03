@@ -104,7 +104,7 @@ class Trie {
         toRemove.forEach(word => {
             suffixesSet.delete(word);
         });
-        return suffixesSet.size > 0 ? suffixesSet : null;
+        return suffixesSet;
     }
 }
 
