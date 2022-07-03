@@ -13,6 +13,7 @@ function AnalyzeEmails() {
     const [loading, setLoading] = useState(true);
     const [snippets, setSnippets] = useState([]);
     const [csvFileName, setCsvFileName] = useState(null);
+    const [noResultsFound, setNoResultsFound] = useState(false);
     const location = useLocation();
     const history = useHistory();
     const [name, setName] = useState(null);
@@ -46,9 +47,11 @@ function AnalyzeEmails() {
             if (!response.ok) {
                 if (response.status === 401) {
                     handleLogout();
-                } else {
-                    throw Error(response.statusMessage);
+                } else if (response.status === 404) {
+                    setNoResultsFound(true);
+                    setLoading(false);
                 }
+                throw Error(response.statusMessage);
             }
             return response.json();
         }).then(data => {
@@ -84,18 +87,25 @@ function AnalyzeEmails() {
             <Header/>
             <Container style={{minWidth: '100%', display: 'flex', flexDirection: 'column'}}>
                 {loading && <Loading name={name}/>}
-                <Container>
-                    {!loading &&
-                        <Row style={{display: 'flex', flexDirection: 'row', margin: '30px'}}>
-                            <h4 style={{color: 'red', flex: 7}}>Congrats {name}, we have found
-                                top {snippets.length} snippets for
-                                you. You can export them and import them later to TextBlaze!</h4>
-                            <Button variant='danger' style={{flex: 1}} onClick={downloadCSVFile}>Export</Button>
-                        </Row>}
 
+                {!loading && !noResultsFound &&
+                    <Container style={{minWidth: '100%', display: 'flex', marginTop: '30px'}}>
+                        <h4 style={{color: 'red'}}>Congrats {name}, we have found
+                            top {snippets.length} snippets for
+                            you. You can export them and import them later to TextBlaze!</h4>
+
+                        <Button style={{marginLeft: '10px', flex: 1}} variant='danger'
+                                onClick={downloadCSVFile}>Export</Button>
+                    </Container>}
+                <Container style={{
+                    display: 'flex', flexDirection: 'row', marginBottom: '30px', marginTop: '30px',
+                    justifyContent: 'center'
+                }}>
+                    {noResultsFound &&
+                        <h4 style={{color: 'red', textAlign: 'center'}}>Unfortunately, no results found!</h4>}
                 </Container>
                 {snippets.map((snippet, index) => (
-                    <Card bg='warning' key={`card-${index}`} xs={4} style={{margin: '30px'}}
+                    <Card bg='warning' key={`card-${index}`} xs={4} style={{marginBottom: '30px'}}
                     >
                         <Card.Header as='h5' className='text-light'>Suggested Shortcut: /{snippet['shortcut']}
                         </Card.Header>

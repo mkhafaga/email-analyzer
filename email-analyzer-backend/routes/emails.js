@@ -34,10 +34,13 @@ router.post('/analyze-sent-messages', async function (request, response) {
                 return response.status(error.code).send({error: error.message});
             }
 
-            if (res.data) {
+            if (res.data && res.data.messages) {
+                console.log(JSON.stringify(res));
                 res.data.messages.forEach(message => {
                     sentMessages.set(message.id, message);
                 });
+            }else{
+                return response.sendStatus(404);
             }
 
             if (!res.data.nextPageToken) {
