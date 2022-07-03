@@ -2,7 +2,7 @@ import React from 'react'
 import '../App.css';
 import {useHistory, useLocation} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {Button, Card, Container, Row} from "react-bootstrap";
+import {Button, Card, Container} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from "./Loading.js";
 import Header from "./Header.js";

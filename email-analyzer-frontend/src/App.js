@@ -2,7 +2,7 @@ import './App.css';
 import Login from "./components/Login.js";
 import AnalyzeEmails from "./components/AnalyzeEmails.js";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
-import {useEffect, React, useState, useMemo} from "react";
+import {useEffect, React} from "react";
 import {gapi} from "gapi-script";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Error from "./components/Error.js";
